@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+#include "tokenize.h"
 
 typedef enum {
     TYPE_VAR,
@@ -10,29 +14,18 @@ typedef enum {
     TYPE_FUNC, 
 } NodeType;
 
-typedef struct {
-    const char* name;
-    double (*func_ptr)(double); //function that recives a double as parameter and returns a double
-} MathFunction;
-
-MathFunction func_map[] = {
-    {"sin", sin},
-    {"cos", cos},
-    {"sqrt", sqrt},
-};
-
-struct Node {
+typedef struct Node{
     NodeType type;
     double value;
     char op;
     double (*func_ptr)(double); 
     struct Node *left;
     struct Node *right;
-};
+}Node;
 
-struct Node*
+Node*
 node_new_num(double val) {
-    struct Node* node = malloc(sizeof(struct Node));
+    Node* node = malloc(sizeof(Node));
 
     if (node) {
         node -> type = TYPE_NUM;
@@ -43,9 +36,9 @@ node_new_num(double val) {
     return node;
 };
 
-struct Node* 
-node_new_op(char op, struct Node* left, struct Node* right) {
-    struct Node* node = malloc(sizeof(struct Node));
+Node* 
+node_new_op(char op, Node* left, Node* right) {
+    Node* node = malloc(sizeof(Node));
 
     if (node) {
         node -> type = TYPE_OP;
@@ -56,9 +49,9 @@ node_new_op(char op, struct Node* left, struct Node* right) {
     return node;
 };
 
-struct Node*
-node_new_func(double (*func)(double), struct Node* left, struct Node* right) {
-    struct Node* node = malloc(sizeof(struct Node));
+Node*
+node_new_func(double (*func)(double), Node* left, Node* right) {
+    Node* node = malloc(sizeof(Node));
 
     if (node) {
         node -> type = TYPE_FUNC;
@@ -69,9 +62,9 @@ node_new_func(double (*func)(double), struct Node* left, struct Node* right) {
     return node;
 };
 
-struct Node* 
+Node* 
 node_new_var() {
-    struct Node* node = malloc(sizeof(struct Node));
+    Node* node = malloc(sizeof(Node));
     if (node) {
         node->type = TYPE_VAR;
         node->left = NULL;
@@ -81,7 +74,7 @@ node_new_var() {
 };
 
 double
-eval_node(struct Node* node, double x_val) {
+eval_node(Node* node, double x_val) {
     if (!node) return 0;
 
     switch (node->type) {
@@ -105,7 +98,7 @@ eval_node(struct Node* node, double x_val) {
 };
 
 void // recursive function to clean the memory of a node and all it's children
-node_free_mem(struct Node* node) {
+node_free_mem(Node* node) {
     if (!node) return;
 
     node_free_mem(node->left);
@@ -116,16 +109,16 @@ node_free_mem(struct Node* node) {
 
 int main() {
 
-    struct Node* n2 = node_new_num(2.0);
-    struct Node* n5 = node_new_num(5.0);
-    struct Node* op_mul = node_new_op('*', n2, n5);
+    Node* n2 = node_new_num(2.0);
+    Node* n5 = node_new_num(5.0);
+    Node* op_mul = node_new_op('*', n2, n5);
 
-    struct Node* var_x = node_new_var();
-    struct Node* f_sin = node_new_func(sin, var_x, NULL);
+    Node* var_x = node_new_var();
+    Node* f_sin = node_new_func(sin, var_x, NULL);
 
-    struct Node* root = node_new_op('+', f_sin, op_mul);
+    Node* root = node_new_op('+', f_sin, op_mul);
 
-    double x = 25.59;
+    double x = 0.99;
     double result = eval_node(root, x);
 
     SetConsoleOutputCP(CP_UTF8);
@@ -135,6 +128,30 @@ int main() {
 
     node_free_mem(root);
     root = NULL;
+
+
+    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) + 10 \n");
+
+    Token tokens[100];
+    int count = 0;
+    const char* expressao = "sin(x) * (10 - 5)";
+
+    tokenize(expressao, tokens, &count);
+
+    printf("Tokens encontrados: %d\n", count);
+
+    const char* token_type_names[] = {
+        "TOK_NUM",
+        "TOK_VAR",
+        "TOK_FUNC",
+        "TOK_OP",
+        "TOK_LPAREN",
+        "TOK_RPAREN",
+    };
+
+    for(int i = 0; i < count; i++) {
+        printf("Token %d: Tipo %s\n", i, token_type_names[tokens[i].type]);
+    }
 
     return 0;
 }
