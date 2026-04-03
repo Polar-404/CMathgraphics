@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include "tokenize.h"
+#include "rpn.h"
 
 typedef enum {
     TYPE_VAR,
@@ -109,6 +110,8 @@ node_free_mem(Node* node) {
 
 int main() {
 
+    int size_token = 100;
+
     Node* n2 = node_new_num(2.0);
     Node* n5 = node_new_num(5.0);
     Node* op_mul = node_new_op('*', n2, n5);
@@ -130,9 +133,9 @@ int main() {
     root = NULL;
 
 
-    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) + 10 \n");
+    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) * (10 - 5) \n");
 
-    Token tokens[100];
+    Token tokens[size_token];
     int count = 0;
     const char* expressao = "sin(x) * (10 - 5)";
 
@@ -148,6 +151,8 @@ int main() {
         "TOK_LPAREN",
         "TOK_RPAREN",
     };
+
+    rpn(tokens, count, size_token);
 
     for(int i = 0; i < count; i++) {
         printf("Token %d: Tipo %s\n", i, token_type_names[tokens[i].type]);
