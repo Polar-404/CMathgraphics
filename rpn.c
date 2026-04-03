@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "tokenize.h"
 
+#include <stdio.h> // debug
+
 int
 operator_to_precedence(char operator){
     switch(operator) {
@@ -22,12 +24,12 @@ is_smaller_or_equal(int precedence, Token *stack){
         return precedence >= 4;
     }
     else{
-        return precedence >= stack->op;
+        return precedence >= operator_to_precedence(stack->op);
     }
 }
 
 void
-flush(Token *temp, Token *stack, int temp_ptr, int stack_ptr, Token *token){
+flush(Token *temp, Token *stack, int *temp_ptr, int *stack_ptr, Token *token){
 
     // sets precedence based on op or paren
     int precedence;
@@ -39,11 +41,9 @@ flush(Token *temp, Token *stack, int temp_ptr, int stack_ptr, Token *token){
         precedence = operator_to_precedence(token->op);
     }
 
-    while(is_smaller_or_equal(precedence, &stack[stack_ptr])){ // bigger or equal top of stack
-        temp[temp_ptr++] = stack[stack_ptr--]; // flush it to temp
+    while(is_smaller_or_equal(precedence, &stack[*stack_ptr-1])){ // bigger or equal top of stack
+        temp[(*temp_ptr)++] = stack[(*stack_ptr)--]; // flush it to temp
     }
-    stack[stack_ptr++] = *token; // alredy did token_ptr++ on the function call
-
 }
 
 void
@@ -58,6 +58,13 @@ rpn(Token *tokens, int count, int size_token){ // malditos poloneses
     stack[0].op = ' '; // initializing first value of op in order to compare later
 
     while (token_ptr < count){
+        for(int i = 0; i < temp_ptr; i++) {
+            printf("temp %d: Tipo %d\n", i, temp[i].type);
+        }
+        for(int i = 0; i < stack_ptr; i++) {
+            printf("stack %d: Tipo %d\n", i, stack[i].type);
+        }
+        printf("aaaa");
         switch (tokens[token_ptr].type){
             case TOK_NUM:
             case TOK_VAR:
@@ -68,7 +75,7 @@ rpn(Token *tokens, int count, int size_token){ // malditos poloneses
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 else{
-                    flush(temp, stack, temp_ptr, stack_ptr, &tokens[token_ptr++]);
+                    flush(temp, stack, &temp_ptr, &stack_ptr, &tokens[token_ptr]);
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 continue;
@@ -77,7 +84,7 @@ rpn(Token *tokens, int count, int size_token){ // malditos poloneses
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 else{
-                    flush(temp, stack, temp_ptr, stack_ptr, &tokens[token_ptr++]);
+                    flush(temp, stack, &temp_ptr, &stack_ptr, &tokens[token_ptr]);
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 continue;
@@ -87,7 +94,7 @@ rpn(Token *tokens, int count, int size_token){ // malditos poloneses
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 else{
-                    flush(temp, stack, temp_ptr, stack_ptr, &tokens[token_ptr++]);
+                    flush(temp, stack, &temp_ptr, &stack_ptr, &tokens[token_ptr]);
                     stack[stack_ptr++] = tokens[token_ptr++];
                 }
                 continue;
@@ -95,6 +102,11 @@ rpn(Token *tokens, int count, int size_token){ // malditos poloneses
                 token_ptr++;
                 continue;
         }
+    }
+
+    // final flush
+    while(stack_ptr>=0){ // bigger or equal top of stack
+        temp[temp_ptr++] = stack[stack_ptr--]; // flush it to temp
     }
     
     // end

@@ -137,7 +137,7 @@ int main() {
 
     Token tokens[size_token];
     int count = 0;
-    const char* expressao = "sin(x) * (10 - 5)";
+    const char* expressao = "x * 10 - 5";
 
     tokenize(expressao, tokens, &count);
 
