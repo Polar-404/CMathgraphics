@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include "tokenize.h"
+#include "rpn.h"
 
 typedef enum {
     TYPE_VAR,
@@ -109,6 +110,8 @@ node_free_mem(Node* node) {
 
 int main() {
 
+    int size_token = 100;
+
     Node* n2 = node_new_num(2.0);
     Node* n5 = node_new_num(5.0);
     Node* op_mul = node_new_op('*', n2, n5);
@@ -130,11 +133,11 @@ int main() {
     root = NULL;
 
 
-    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) + 10 \n");
+    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) * (10 - 5) \n");
 
-    Token tokens[100];
+    Token tokens[size_token];
     int count = 0;
-    const char* expressao = "sin(x) * (10 - 5)";
+    const char* expressao = "sin(x) * (10 - 5) + 1";
 
     tokenize(expressao, tokens, &count);
 
@@ -149,9 +152,21 @@ int main() {
         "TOK_RPAREN",
     };
 
+    parse_to_rpn(tokens, &count, size_token);
+
     for(int i = 0; i < count; i++) {
-        printf("Token %d: Tipo %s\n", i, token_type_names[tokens[i].type]);
+        printf("Token %d: tipo=%-12s", i, token_type_names[tokens[i].type]);
+
+        switch(tokens[i].type) {
+            case TOK_NUM:  printf(" value=%.4f", tokens[i].value);       break;
+            case TOK_OP:   printf(" op='%c'",    tokens[i].op);          break;
+            case TOK_FUNC: printf(" func=%p",    (void*)tokens[i].func); break;
+            case TOK_VAR:                                                  break;
+            default:                                                       break;
+        }
+        printf("\n");
     }
+    fflush(stdout);
 
     return 0;
 }
