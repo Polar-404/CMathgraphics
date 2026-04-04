@@ -29,7 +29,12 @@ typedef struct {
 MathFunction func_map[] = {
     {"sin", sin},
     {"cos", cos},
+    {"tan", tan},
+
     {"sqrt", sqrt},
+    {"exp", exp},
+    
+    {"log", log},
 };
 
 typedef double (*MathFunc)(double);
