@@ -2,11 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #include "tokenize.h"
-#include "rpn.h"
 
 typedef enum {
     TYPE_VAR,
@@ -74,6 +70,38 @@ node_new_var() {
     return node;
 };
 
+Node*
+build_node_tree(Token* tokens, int count) {
+    Node* stack[count];
+    int stack_ptr = -1;
+
+    for(int i = 0; i < count; i++) {
+        switch(tokens[i].type) {
+
+            case TOK_NUM: 
+                stack[++stack_ptr] = node_new_num(tokens[i].value);
+                break;
+
+            case TOK_VAR: 
+                stack[++stack_ptr] = node_new_var();
+                break;
+
+            case TOK_FUNC:
+                Node* arg = stack[stack_ptr--];
+                stack[++stack_ptr] = node_new_func(tokens[i].func, arg, NULL);
+                break;
+
+            case TOK_OP:
+                Node* right = stack[stack_ptr--];
+                Node* left = stack[stack_ptr--];
+
+                stack[++stack_ptr] = node_new_op(tokens[i].op, left, right);
+                break;
+        }
+    }
+    return stack[0];
+}
+
 double
 eval_node(Node* node, double x_val) {
     if (!node) return 0;
@@ -106,67 +134,4 @@ node_free_mem(Node* node) {
     node_free_mem(node->right);
 
     free(node);
-}
-
-int main() {
-
-    int size_token = 100;
-
-    Node* n2 = node_new_num(2.0);
-    Node* n5 = node_new_num(5.0);
-    Node* op_mul = node_new_op('*', n2, n5);
-
-    Node* var_x = node_new_var();
-    Node* f_sin = node_new_func(sin, var_x, NULL);
-
-    Node* root = node_new_op('+', f_sin, op_mul);
-
-    double x = 0.99;
-    double result = eval_node(root, x);
-
-    SetConsoleOutputCP(CP_UTF8);
-
-    printf("Equação: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) + 2 × 5\n");
-    printf("with 𝒙 = %.2f, 𝒇(𝒙) = %.2f\n", x, result);
-
-    node_free_mem(root);
-    root = NULL;
-
-
-    printf("EQUATION TOKENS: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) * (10 - 5) \n");
-
-    Token tokens[size_token];
-    int count = 0;
-    const char* expressao = "sin(x) * (10 - 5) + 1";
-
-    tokenize(expressao, tokens, &count);
-
-    printf("Tokens encontrados: %d\n", count);
-
-    const char* token_type_names[] = {
-        "TOK_NUM",
-        "TOK_VAR",
-        "TOK_FUNC",
-        "TOK_OP",
-        "TOK_LPAREN",
-        "TOK_RPAREN",
-    };
-
-    parse_to_rpn(tokens, &count, size_token);
-
-    for(int i = 0; i < count; i++) {
-        printf("Token %d: tipo=%-12s", i, token_type_names[tokens[i].type]);
-
-        switch(tokens[i].type) {
-            case TOK_NUM:  printf(" value=%.4f", tokens[i].value);       break;
-            case TOK_OP:   printf(" op='%c'",    tokens[i].op);          break;
-            case TOK_FUNC: printf(" func=%p",    (void*)tokens[i].func); break;
-            case TOK_VAR:                                                  break;
-            default:                                                       break;
-        }
-        printf("\n");
-    }
-    fflush(stdout);
-
-    return 0;
 }

@@ -1,5 +1,9 @@
 #include "tokenize.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Reorders tokens into [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation) (RPN).
  * * Using an implementation of the Dijkstra's [Shunting-yard algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm). This process reorders 
@@ -12,3 +16,7 @@
  * @param size_token Maximum capacity of the token buffer to prevent overflows
  */
 void parse_to_rpn(Token *tokens, int *count, int size_token);
+
+#ifdef __cplusplus
+}
+#endif
