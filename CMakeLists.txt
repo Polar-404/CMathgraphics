@@ -5,7 +5,7 @@ project(MathGrapher C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(math_test main.c tokenize.c rpn.c)
+add_executable(math_test main.c tokenize.c rpn.c ast.c)
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(math_test m)
