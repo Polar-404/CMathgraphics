@@ -80,6 +80,7 @@ int main() {
         render_frame();
     }
 
+    cleanup_opengl();
     node_free_mem(root);
 
     return 0;
