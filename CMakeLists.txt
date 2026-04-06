@@ -11,9 +11,20 @@ add_executable(math_test
     src/calc/rpn.c
     src/calc/ast.c
     src/rendering/renderer.cpp
+    libs/glad/src/glad.c
 )
 
-target_include_directories(math_test PRIVATE src)
+target_include_directories(math_test PRIVATE 
+    src 
+    libs/glad/include
+    libs/glfw-3.4.bin.WIN64/include
+)
+
+target_link_directories(math_test PRIVATE 
+    libs/glfw-3.4.bin.WIN64/lib-mingw-w64
+)
+
+target_link_libraries(math_test glfw3)
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(math_test m)

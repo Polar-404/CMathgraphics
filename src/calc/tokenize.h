@@ -1,6 +1,10 @@
 #ifndef TOKENIZE_H
 #define TOKENIZE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @file tokenize.h
  * @brief Lexical analysis module for mathematical expressions.
@@ -41,5 +45,9 @@ typedef struct {
  * @param count  Pointer to an integer to store the resulting token count
  */
 void tokenize(const char* input, Token* tokens, int* count);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
