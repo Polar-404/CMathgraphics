@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include <vector>
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -9,13 +11,14 @@
 #include "calc/rpn.h"
 #include "calc/ast.h"
 
+//rendering:
+#include "rendering/renderer.h"
+
 int main() {
 
     int size_token = 100;
 
     SetConsoleOutputCP(CP_UTF8);
-
-    printf("Equação: 𝒇(𝒙) = 𝒔𝒊𝒏(𝒙) + 2 × 5\n");
 
     printf("EQUATION: 𝒇(𝒙) = 𝒄𝒐𝒔(𝒙) * (𝒔𝒊𝒏(1) - 0.5) + 1 \n");
 
@@ -56,10 +59,28 @@ int main() {
     printf("press any key to continue...\n");
     scanf("");
 
+    // C++ / OPENGL rendering:
+    init_opengl();
+
+    std::vector<float> points;
+
     for(double x = -1; x < 1; x+=0.01) {
         double result = eval_node(root, x);
+
+        points.push_back(static_cast<float>(x));      // X
+        points.push_back(static_cast<float>(result * 0.5 /* multiplicar por meio pra achatar um pouco o grafico*/)); // Y
+        points.push_back(0.0f);                       // Z (2D)
+
         printf("with x = %.2f Result: %.4f\n", x, result);
     }
+
+    update_points(points.data(), points.size());
+
+    while (true) {
+        render_frame();
+    }
+
+    cleanup_opengl();
     node_free_mem(root);
 
     return 0;
