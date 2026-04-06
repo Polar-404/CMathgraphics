@@ -1,6 +1,10 @@
 #ifndef AST_H
 #define AST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "tokenize.h"
 
 typedef enum {
@@ -33,5 +37,9 @@ Node* build_node_tree(Token* tokens, int count);
 double eval_node(Node* node, double x_val);
 
 void node_free_mem(Node* node);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
