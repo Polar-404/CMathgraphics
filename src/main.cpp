@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #include <vector>
+#include <iostream>
+#include <string>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -18,11 +20,14 @@ int main() {
 
     SetConsoleOutputCP(CP_UTF8);
 
-    const char* expressao = "abs(sin(x)) * (abs(sin(x)) - 1)";
+    std::cout << "Write your math expression...\n" << std::endl;
+
+    std::string input_expr;
+    std::getline(std::cin, input_expr);
     int count = 0;
 
     //tokenize the expression
-    Token* tokens = tokenize(expressao, &count);
+    Token* tokens = tokenize(input_expr.c_str(), &count);
 
     printf("Tokens encontrados: %d\n", count);
 
