@@ -35,6 +35,7 @@ MathFunction func_map[] = {
     {"exp", exp},
     
     {"log", log},
+    {"abs", fabs},
 };
 
 typedef double (*MathFunc)(double);
@@ -42,7 +43,9 @@ typedef double (*MathFunc)(double);
  //recieves a given math function name as a string (e.g: "cos"), and returns the corresponding math.h function ptr)
 MathFunc
 find_function(const char* name) { 
-    for(int i = 0; i < 3; i++) {
+    int number_of_funcs = sizeof(func_map) / sizeof(func_map[0]);
+
+    for(int i = 0; i < number_of_funcs; i++) {
         if (strcmp(name, func_map[i].name) == 0) {
             return func_map[i].func_ptr;
         }
@@ -50,12 +53,25 @@ find_function(const char* name) {
     return NULL;
 }
 
-void
-tokenize(const char* input, Token* tokens, int* count) {
+Token*
+tokenize(const char* input, int* count) {
+    int capacity = 32;
+    Token* tokens = (Token*)malloc(sizeof(Token) * capacity);
+    
     const char* p = input; //creating a copy of the pointer so the original addr doenst get lost
-    //*count = 0; //dereferencing and writing zero at the given memory address
+    *count = 0; //dereferencing and writing zero at the given memory address
 
     while(*p) {
+        //alocating more memory if needed
+        if (*count >= capacity) {
+            capacity *= 2;
+            tokens = (Token*)realloc(tokens, sizeof(Token) * capacity);
+            
+            if (tokens == NULL) {
+                printf("Erro: Falta de memoria!\n");
+                exit(1);
+            }
+        }
         //spaces (ignores)
         if(isspace(*p)) { p++; continue; }
 
@@ -95,7 +111,6 @@ tokenize(const char* input, Token* tokens, int* count) {
                     exit(1);
                 }
             }
-            p++;
             (*count)++;
         }
         //anything that isn't a number nor a letter
@@ -110,4 +125,5 @@ tokenize(const char* input, Token* tokens, int* count) {
             (*count)++;
         }
     }
+    return tokens;
 }

@@ -16,17 +16,13 @@
 
 int main() {
 
-    int size_token = 100;
-
     SetConsoleOutputCP(CP_UTF8);
 
-    printf("EQUATION: 𝒇(𝒙) = 𝒄𝒐𝒔(𝒙) * (𝒔𝒊𝒏(1) - 0.5) + 1 \n");
-
-    Token tokens[size_token];
+    const char* expressao = "abs(sin(x)) * (abs(sin(x)) - 1)";
     int count = 0;
-    const char* expressao = "cos(x) * (sin(1) - 0.5) + 1";
 
-    tokenize(expressao, tokens, &count);
+    //tokenize the expression
+    Token* tokens = tokenize(expressao, &count);
 
     printf("Tokens encontrados: %d\n", count);
 
@@ -39,7 +35,7 @@ int main() {
         "TOK_RPAREN",
     };
 
-    parse_to_rpn(tokens, &count, size_token);
+    parse_to_rpn(tokens, &count);
 
     for(int i = 0; i < count; i++) {
         printf("Token %d: tipo=%-12s", i, token_type_names[tokens[i].type]);
@@ -56,19 +52,17 @@ int main() {
     fflush(stdout);
 
     Node* root = build_node_tree(tokens, count);
-    printf("press any key to continue...\n");
-    scanf("");
 
     // C++ / OPENGL rendering:
     init_opengl();
 
     std::vector<float> points;
 
-    for(double x = -1; x < 1; x+=0.01) {
+    for(double x = -10; x <= 10; x+=0.1) {
         double result = eval_node(root, x);
 
-        points.push_back(static_cast<float>(x));      // X
-        points.push_back(static_cast<float>(result * 0.5 /* multiplicar por meio pra achatar um pouco o grafico*/)); // Y
+        points.push_back(static_cast<float>(x * 0.1));      // X
+        points.push_back(static_cast<float>(result * 0.1 /* multiplicar por meio pra achatar um pouco o grafico*/)); // Y
         points.push_back(0.0f);                       // Z (2D)
 
         printf("with x = %.2f Result: %.4f\n", x, result);
@@ -82,6 +76,7 @@ int main() {
 
     cleanup_opengl();
     node_free_mem(root);
+    free(tokens);
 
     return 0;
 }

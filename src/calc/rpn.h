@@ -15,7 +15,7 @@ extern "C" {
  * @param count      Pointer to the token count (updated after parentheses removal)
  * @param size_token Maximum capacity of the token buffer to prevent overflows
  */
-void parse_to_rpn(Token *tokens, int *count, int size_token);
+void parse_to_rpn(Token *tokens, int *count);
 
 #ifdef __cplusplus
 }

@@ -6,5 +6,6 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
-build\Debug\math_test.exe
-pause
+
+cd build
+math_test.exe

@@ -1,4 +1,6 @@
 #include "tokenize.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int
 operator_to_precedence(char operator){
@@ -6,7 +8,6 @@ operator_to_precedence(char operator){
         case '-': return 1;
         case '+': return 1;
         case '/': return 2;
-        case 'x': return 2;
         case '*': return 2;
         default:  return 0;
     }
@@ -47,13 +48,18 @@ flush(Token *temp, Token *stack, int *temp_ptr, int *stack_ptr, Token *token){
 
 // converts a array of tokens into the "Reverse Polish Notation" format
 void
-parse_to_rpn(Token *tokens, int *count, int size_token){ //malditos poloneses
+parse_to_rpn(Token *tokens, int *count){ //malditos poloneses
     int token_ptr = 0;
     int temp_ptr  = 0;
     int stack_ptr = -1; // -1 = empty stack
 
-    Token temp[size_token];
-    Token stack[size_token];
+    Token *temp = (Token*)malloc(sizeof(Token) * (*count));
+    Token *stack = (Token*)malloc(sizeof(Token) * (*count));
+
+    if (temp == NULL || stack == NULL) {
+        printf("[error] Failed to alocate memory for the RPN parser\n");
+        exit(1);
+    }
 
     while (token_ptr < *count){
         Token *tok = &tokens[token_ptr];
@@ -118,5 +124,9 @@ parse_to_rpn(Token *tokens, int *count, int size_token){ //malditos poloneses
             tokens[new_count++] = temp[i];
         }
     }
+    
     *count = new_count;
+
+    free(temp);
+    free(stack);
 }

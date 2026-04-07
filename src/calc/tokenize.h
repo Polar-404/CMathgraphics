@@ -41,10 +41,9 @@ typedef struct {
  * * scans the input string and populates the provided token array. 
  * It ignores whitespace and recognizes numbers, operators, and basic functions.
  * * @param input  The raw math expression string (e.g., "3 * sin(x)")
- * @param tokens Output array to store identified tokens
  * @param count  Pointer to an integer to store the resulting token count
  */
-void tokenize(const char* input, Token* tokens, int* count);
+Token* tokenize(const char* input, int* count);
 
 #ifdef __cplusplus
 }
