@@ -1,6 +1,6 @@
 # CMathGraphics
 
-A low-level math function plotter written in C (computation) and C++ with OpenGL (rendering). Type any expression and see it plotted in real time.
+A low-level math function plotter written in C (computation) and C++ with OpenGL (rendering). Type any expression and see it's graph plotted in real time.
 
 ---
 
@@ -30,8 +30,6 @@ $$ 3 + 4 \times x \implies 3 \ 4 \ x \ \times \ + $$
 
 **4. Evaluation** — `eval_node(root, x)` walks the tree recursively for each value of `x` in the domain `[-10, 10]`, producing a stream of `(x, f(x))` pairs.
 
----
-
 ### Rendering pipeline (C++ / OpenGL)
 
 Points are uploaded to the GPU as a VBO and drawn with `GL_LINE_STRIP`, connecting samples in order to form the curve. The coordinate range is scaled so that the full domain fits the viewport:
@@ -43,8 +41,6 @@ points.push_back(0.0f);                               // Z (2D)
 ```
 
 The grid is drawn separately via a fullscreen quad — a fragment shader runs over every pixel and decides whether it falls on a grid line, using the window dimensions passed as uniforms.
-
----
 
 ### Main loop
 
@@ -64,7 +60,6 @@ while (true) {
 ```
 
 ---
-
 ## Supported syntax
 
 | Token type | Examples |
@@ -98,7 +93,6 @@ sqrt(1 - x^2)
 </div>
 
 ---
-
 ## Building
 
 > Dependencies: OpenGL, GLFW, GLAD
@@ -109,5 +103,7 @@ cmake -B build && cmake --build build
 ```
 
 ---
+## Licenses
 
-## License
+Distributed under the [**MIT License**](LICENSE). 
+Feel free to study, modify, and use this code in your own experiments.
