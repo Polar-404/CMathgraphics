@@ -36,6 +36,9 @@ MathFunction func_map[] = {
     
     {"log", log},
     {"abs", fabs},
+    {"ceil", ceil},
+    {"floor", floor},
+    {"logten", log10},
 };
 
 typedef double (*MathFunc)(double);

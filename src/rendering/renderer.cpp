@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 
+#include "utils/readfile.hpp"
+#include "drawgrid.hpp"
+
 GLFWwindow* window = nullptr;
 
 unsigned int VAO, VBO = 0;
@@ -12,22 +15,13 @@ int num_vertices = 0;
 
 unsigned int shader_program;
 
+const float _WINDOW_WIDTH = 800.0;
+const float _WINDOW_HEIGHT = 600.0;
+
+
 //logs
 int success;
 char infoLog[512];
-
-std::string read_shader_file(const char* filepath) {
-    std::ifstream file(filepath);
-
-    if(!file.is_open()) {
-        std::cout << "[ERROR] Failed to open shader file: ' " << filepath << " '" << std::endl;
-        return "";
-    }
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
 
 void init_opengl() {
     if(!glfwInit()) {
@@ -38,7 +32,7 @@ void init_opengl() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(800, 600, "GraphPlotter", NULL, NULL);
+    window = glfwCreateWindow(_WINDOW_WIDTH, _WINDOW_HEIGHT, "GraphPlotter", NULL, NULL);
     if(window == NULL) {
         std::cout << "[ERROR] Failed to inicialize a Window for the program." << std::endl;
         glfwTerminate();
@@ -52,10 +46,15 @@ void init_opengl() {
         return;
     }
 
-    glLineWidth(3.0f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glLineWidth(2.0f);
 
     std::string vert_code = read_shader_file("../src/shaders/basic.vert");
     std::string frag_code = read_shader_file("../src/shaders/basic.frag");
+
+    setup_grid_shader();
 
     const char* vertexShaderSource = vert_code.c_str();
     const char* fragmentShaderSource = frag_code.c_str();
@@ -132,6 +131,8 @@ void render_frame() {
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    draw_grid(_WINDOW_WIDTH, _WINDOW_HEIGHT);
 
     glUseProgram(shader_program);
 

@@ -16,7 +16,7 @@
 #include "calc/ast.h"
 
 //rendering:
-#include "rendering/renderer.h"
+#include "rendering/renderer.hpp"
 
 std::string math_expr = "x";
 std::atomic<bool> new_expr { false };
@@ -73,7 +73,7 @@ ExprInfo calc_expr_tree(const std::string& math_expr) {
 
     std::vector<float> points;
 
-    for(double x = -10; x <= 10; x+=0.1) {
+    for(double x = -10; x <= 10; x+=0.01) {
         double result = eval_node(root, x);
 
         points.push_back(static_cast<float>(x * 0.1));      // X

@@ -10,7 +10,11 @@ add_executable(math_test
     src/calc/tokenize.c
     src/calc/rpn.c
     src/calc/ast.c
+
     src/rendering/renderer.cpp
+    src/rendering/drawgrid.cpp
+    src/rendering/utils/readfile.cpp
+    
     libs/glad/src/glad.c
 )
 
