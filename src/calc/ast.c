@@ -115,6 +115,7 @@ eval_node(Node* node, double x_val) {
                     case '-': return eval_node(node->left, x_val) - eval_node(node->right, x_val);
                     case '*': return eval_node(node->left, x_val) * eval_node(node->right, x_val);
                     case '/': return eval_node(node->left, x_val) / eval_node(node->right, x_val);
+                    case '^': return pow(eval_node(node->left, x_val), eval_node(node->right, x_val));
                     default: return 0;
                 }
         case TYPE_FUNC:
