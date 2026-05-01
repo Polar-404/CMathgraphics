@@ -13,7 +13,9 @@ add_executable(math_test
 
     src/rendering/renderer.cpp
     src/rendering/drawgrid.cpp
-    src/rendering/utils/readfile.cpp
+
+    src/utils/readfile.cpp
+    src/utils/calc_elapsed_time.cpp
     
     libs/glad/src/glad.c
 )
