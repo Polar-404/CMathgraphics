@@ -15,6 +15,8 @@
 #include "calc/rpn.h"
 #include "calc/ast.h"
 
+#include "utils/calc_elapsed_time.hpp"
+
 //rendering:
 #include "rendering/renderer.hpp"
 
@@ -37,7 +39,7 @@ struct ExprInfo {
     int count;
 };
 
-ExprInfo calc_expr_tree(const std::string& math_expr) {
+ExprInfo calc_expr_tree(const std::string &math_expr) {
 
     int count = 0;
     Token* tokens = tokenize(math_expr.c_str(), &count);
@@ -47,6 +49,7 @@ ExprInfo calc_expr_tree(const std::string& math_expr) {
     const char* token_type_names[] = {
         "TOK_NUM",
         "TOK_VAR",
+        "TOK_TIME",
         "TOK_FUNC",
         "TOK_OP",
         "TOK_LPAREN",
@@ -71,19 +74,23 @@ ExprInfo calc_expr_tree(const std::string& math_expr) {
 
     Node* root = build_node_tree(tokens, count);
 
+    return {tokens, root, count};
+}
+
+void recalc_points(Node* root, double t) {
+    if (!root) return;
+
     std::vector<float> points;
 
     for(double x = -10; x <= 10; x+=0.01) {
-        double result = eval_node(root, x);
+        double result = eval_node(root, x, t);
 
         points.push_back(static_cast<float>(x * 0.1));      // X
-        points.push_back(static_cast<float>(result * 0.1 /* multiplicar por meio pra achatar um pouco o grafico*/)); // Y
-        points.push_back(0.0f);                       // Z (2D)
+        points.push_back(static_cast<float>(result * 0.1)); // Y
+        points.push_back(0.0f);                             // Z (2D)
     }
 
     update_points(points.data(), points.size());
-    
-    return {tokens, root, count};
 }
     
 
@@ -96,16 +103,27 @@ int main() {
 
     std::thread input_thread(user_interface);
     ExprInfo current_expr = { nullptr, nullptr, 0 };
+    double expr_start_time = 0.0;
 
     //EXECUTION LOOP
     while (true) {
         if (new_expr) {
+
             std::cout << "Updating graph for: ' " << math_expr << " '\n" << std::endl;
             new_expr = false;
+
+            //freeing memory
+            if (current_expr.root)   node_free_mem(current_expr.root);
+            if (current_expr.tokens) free(current_expr.tokens);
+
             current_expr = calc_expr_tree(math_expr);
+            expr_start_time = TimeManager::get_total_time();
 
             std::cout << "To write a new expression just type it bellow...\n" << std::endl;
         }
+
+        double t = TimeManager::get_total_time() - expr_start_time;
+        recalc_points(current_expr.root, t);
 
         render_frame();
     }

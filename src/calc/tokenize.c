@@ -3,10 +3,12 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 typedef enum {
     TOK_NUM,
     TOK_VAR, 
+    TOK_TIME,
     TOK_FUNC,
     TOK_OP,
     TOK_LPAREN,
@@ -94,7 +96,7 @@ tokenize(const char* input, int* count) {
             char buf[64];
             int i = 0;
             while (isalpha(*p)) {
-                buf[i++] = *p++;
+                buf[i++] = tolower(*p++); // converts into lowercase so it accepts both
             }
             buf[i] = '\0';
 
@@ -103,9 +105,12 @@ tokenize(const char* input, int* count) {
             if (strcmp(buf, "x") == 0) {
                 tokens[*count].type = TOK_VAR;
             }
+            else if (strcmp(buf, "t") == 0) {
+                tokens[*count].type = TOK_TIME;
+            }
             else {
                 double (*f) (double) = find_function(buf);
-                if(*f) {
+                if(f) {
                     tokens[*count].type = TOK_FUNC;
                     tokens[*count].func = f;
                 }

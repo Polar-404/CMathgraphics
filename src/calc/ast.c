@@ -6,6 +6,7 @@
 
 typedef enum {
     TYPE_VAR,
+    TYPE_TIME,
     TYPE_NUM, 
     TYPE_OP,
     TYPE_FUNC, 
@@ -70,6 +71,18 @@ node_new_var() {
     return node;
 };
 
+Node* 
+node_new_time() {
+    Node* node = malloc(sizeof(Node));
+    if (node) {
+        node->type = TYPE_TIME;
+        node->left = NULL;
+        node->right = NULL;
+    }
+    return node;
+};
+
+
 Node*
 build_node_tree(Token* tokens, int count) {
     Node* stack[count];
@@ -84,6 +97,9 @@ build_node_tree(Token* tokens, int count) {
 
             case TOK_VAR: 
                 stack[++stack_ptr] = node_new_var();
+                break;
+            case TOK_TIME:
+                stack[++stack_ptr] = node_new_time();
                 break;
 
             case TOK_FUNC:
@@ -103,24 +119,25 @@ build_node_tree(Token* tokens, int count) {
 }
 
 double
-eval_node(Node* node, double x_val) {
+eval_node(Node* node, double x_val, double t_val) {
     if (!node) return 0;
 
     switch (node->type) {
         case TYPE_NUM:  return node->value;
         case TYPE_VAR:  return x_val;
+        case TYPE_TIME: return t_val;
         case TYPE_OP: 
             switch (node->op) {
-                    case '+': return eval_node(node->left, x_val) + eval_node(node->right, x_val);
-                    case '-': return eval_node(node->left, x_val) - eval_node(node->right, x_val);
-                    case '*': return eval_node(node->left, x_val) * eval_node(node->right, x_val);
-                    case '/': return eval_node(node->left, x_val) / eval_node(node->right, x_val);
-                    case '^': return pow(eval_node(node->left, x_val), eval_node(node->right, x_val));
+                    case '+': return eval_node(node->left, x_val, t_val) + eval_node(node->right, x_val, t_val);
+                    case '-': return eval_node(node->left, x_val, t_val) - eval_node(node->right, x_val, t_val);
+                    case '*': return eval_node(node->left, x_val, t_val) * eval_node(node->right, x_val, t_val);
+                    case '/': return eval_node(node->left, x_val, t_val) / eval_node(node->right, x_val, t_val);
+                    case '^': return pow(eval_node(node->left, x_val, t_val), eval_node(node->right, x_val, t_val));
                     default: return 0;
                 }
         case TYPE_FUNC:
             if (node->func_ptr != NULL) {
-                return node->func_ptr(eval_node(node->left, x_val));
+                return node->func_ptr(eval_node(node->left, x_val, t_val));
             }
             return 0;
     }

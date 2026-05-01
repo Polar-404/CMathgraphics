@@ -66,10 +66,13 @@ parse_to_rpn(Token *tokens, int *count){ //malditos poloneses
 
         switch (tok->type){
             case TOK_NUM:
+
             case TOK_VAR:
                 temp[temp_ptr++] = *tok;
                 break;
-
+            case TOK_TIME:
+                temp[temp_ptr++] = *tok;
+                break;
             case TOK_FUNC:
                 stack[++stack_ptr] = *tok;
                 break;

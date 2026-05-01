@@ -9,6 +9,7 @@ extern "C" {
 
 typedef enum {
     TYPE_VAR,
+    TYPE_TIME,
     TYPE_NUM, 
     TYPE_OP,
     TYPE_FUNC, 
@@ -34,7 +35,7 @@ Node* node_new_func(double (*func)(double), Node* left, Node* right);
 
 Node* build_node_tree(Token* tokens, int count);
 
-double eval_node(Node* node, double x_val);
+double eval_node(Node* node, double x_val, double t_val);
 
 void node_free_mem(Node* node);
 

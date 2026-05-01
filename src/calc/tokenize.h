@@ -19,6 +19,7 @@ extern "C" {
 typedef enum {
     TOK_NUM,    /* numeric constant (stored as double) */
     TOK_VAR,    /* symbolic variable (e.g., 'x') */
+    TOK_TIME,   /* variable that will oscilate with time in a 1:1 relation (+1 sec = +1 val )*/
     TOK_FUNC,   /* mathematical function (e.g., sin, cos, sqrt) */
     TOK_OP,     /* arithmetic operator (+, -, *, /) */
     TOK_LPAREN, /* left parenthesis '(' */

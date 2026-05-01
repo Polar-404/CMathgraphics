@@ -2,7 +2,7 @@
 cmake -S . -B build
 cmake --build build
 if %errorlevel% neq 0 (
-    echo Build falhou!
+    echo Build failed!
     pause
     exit /b 1
 )
